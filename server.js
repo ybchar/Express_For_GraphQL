@@ -12,13 +12,27 @@ let tweets = [
   },
 ];
 
+let users = [
+  {
+    id: "1",
+    firstName: "yb",
+    lastName: "cha",
+  },
+  {
+    id: "2",
+    firstName: "Elon",
+    lastName: "Mask",
+  },
+];
+
 // graphQL
 const typeDefs = gql`
   type User {
     id: ID!
-    username: String!
     firstName: String!
-    lastNmae: String
+    lastName: String!
+    #dynamic field
+    fullName: String!
   }
   type Tweet {
     id: ID!
@@ -26,6 +40,7 @@ const typeDefs = gql`
     author: User!
   }
   type Query {
+    allUsers: [User!]!
     allTweets: [Tweet!]!
     tweet(id: ID!): Tweet
   }
@@ -44,6 +59,10 @@ const resolvers = {
     tweet(root, { id }) {
       return tweets.find((tweet) => tweet.id === id);
     },
+    allUsers() {
+      console.log("alluser called");
+      return users;
+    },
   },
   Mutation: {
     postTweet(_, { text, userId }) {
@@ -59,6 +78,14 @@ const resolvers = {
       if (!tweet) return false;
       tweets = tweets.filter((tweet) => tweet.id !== id);
       return true;
+    },
+  },
+  User: {
+    // 원하는 쿼리 스트링을 return 받을 수 있음
+    fullName({ firstName, lastName }) {
+      // console.log(firstName, lastName);
+      // return "hello";
+      return `${firstName}${lastName}`;
     },
   },
 };
